@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save as PDF with Margins</title>
+    <style>
+        @font-face {
+            font-family: 'Times New Roman';
+            src: url('https://fonts.gstatic.com/s/timesnewroman/v12/XIq6YggxM2Ib1L_6tT59cnoKNFFjDA.woff2') format('woff2');
+        }
+        body {
+            font-family: 'Times New Roman', sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        #setup {
+            display: block;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 50%; /* Set width to 50% */
+            margin: 0 auto; /* Center the div */
+        }
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        div[contenteditable] {
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        h4 {
+            margin: 10px 0;
+        }
+	</style>
+</head>
+
+<body>
+	<!-- Logbook setup -->
+	<div id="setup">
+		<!-- Headings and content-editable divs for specified fields -->
+		<h4>Grade:</h4>
+		<div contenteditable="true" id="grade"></div>
+
+		<h4>Section:</h4>
+		<div contenteditable="true" id="section"></div>
+
+		<h4>Date:</h4>
+		<div contenteditable="true" id="date"></div>
+
+		<h4>Thought of the Day:</h4>
+		<div contenteditable="true" id="thoughtOfTheDay"></div>
+
+		<h4>Word of the Day:</h4>
+		<div contenteditable="true" id="wordOfTheDay"></div>
+
+		<h4>Special Day:</h4>
+		<div contenteditable="true" id="specialDay"></div>
+
+		<h4>GK:</h4>
+		<div contenteditable="true" id="gk"></div>
+
+		<div id="inputFields"></div>
+		<button onclick="addFields()">Add</button>
+		<button onclick="saveAsPDF()">Save as PDF</button>
+		<button onclick="refreshContents()">Refresh</button>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+	<script>
+		let serialNumber = 1;
+
+        function showLogbookSetup() {
+            const setupDiv = document.getElementById('setup');
+            setupDiv.style.display = 'block';
+        }
+
+        function refreshContents() {
+            // Clear the content-editable divs within the setup
+            const divs = document.querySelectorAll('#setup div[contenteditable]');
+            for (let div of divs) {
+                div.textContent = '';
+            }
+            document.getElementById('inputFields').innerHTML = '';
+            serialNumber = 1; // Reset the serial number
+        }
+
+        function addFields() {
+            const fieldsDiv = document.getElementById('inputFields');
+            
+            const periodHeading = document.createElement('h4');
+            periodHeading.textContent = 'Period:';
+            fieldsDiv.appendChild(periodHeading);
+            const periodDiv = document.createElement('div');
+            periodDiv.contentEditable = 'true';
+            periodDiv.textContent = serialNumber++; // Add the serial number and increment it
+            fieldsDiv.appendChild(periodDiv);
+            
+            const subjectHeading = document.createElement('h4');
+            subjectHeading.textContent = 'Subject:';
+            fieldsDiv.appendChild(subjectHeading);
+            const subjectDiv = document.createElement('div');
+            subjectDiv.contentEditable = 'true';
+            fieldsDiv.appendChild(subjectDiv);
+            
+            const topicHeading = document.createElement('h4');
+            topicHeading.textContent = 'Topic:';
+            fieldsDiv.appendChild(topicHeading);
+            const topicDiv = document.createElement('div');
+            topicDiv.contentEditable = 'true';
+            fieldsDiv.appendChild(topicDiv);
+            
+            fieldsDiv.appendChild(document.createElement('br'));
+        }
+function saveAsPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFont('Times New Roman', 'normal');
+    doc.setFontSize(12); // Set font size to 12 for default
+
+    // Add image to the top of the PDF with 6px margin above
+    const imageUrl = 'https://i.imgur.com/WsGYCK6.jpg';
+    const imgWidth = doc.internal.pageSize.getWidth();
+    const imgHeight = 37;  // Set the height of the image to 37 units
+    const marginTop = 6;   // 6px margin above the image
+    doc.addImage(imageUrl, 'JPEG', 0, marginTop, imgWidth, imgHeight);
+
+    const rowMargin = 14;  // 4 (original margin) + 10 (new margin)
+    const rowWidth = imgWidth - (2 * rowMargin);  // Adjusted for the new margins on both sides
+    let yOffset = marginTop + imgHeight + 15;  // Space between image and first row
+
+    const firstColumnWidth = 70;
+    const secondColumnWidth = rowWidth - firstColumnWidth;
+    const inputFields = [
+        document.getElementById('grade'),
+        document.getElementById('section'),
+        document.getElementById('date'),
+        document.getElementById('thoughtOfTheDay'),
+        document.getElementById('wordOfTheDay'),
+        document.getElementById('specialDay'),
+        document.getElementById('gk')
+    ];
+    
+    // Add rows above the 8th row with two columns each
+    doc.setFontSize(10); // Set font size to 10 for the first 7 rows
+    for (let i = 0; i < 7; i++) {
+        const text = inputFields[i].textContent;
+        const textLines = doc.splitTextToSize(text, secondColumnWidth - 4);
+        const rowHeight = Math.max(7, 7 * textLines.length);  // Ensure minimum height is 7 units
+
+        // Check if content exceeds page height minus bottom margin and add a new page if necessary
+        if (yOffset + rowHeight + 10 > doc.internal.pageSize.getHeight()) {
+            doc.addPage();
+            yOffset = 10;  // Top margin for new page
+        }
+
+        doc.setFillColor(255, 255, 255);
+        doc.rect(rowMargin, yOffset, rowWidth, rowHeight, 'F');
+        doc.rect(rowMargin, yOffset, rowWidth, rowHeight);
+        doc.line(rowMargin + firstColumnWidth, yOffset, rowMargin + firstColumnWidth, yOffset + rowHeight); // Splitting the row into two columns
+        
+        // Add specified text in the first column
+        doc.text(["GRADE", "SECTION", "DATE", "THOUGHT OF THE DAY", "WORD OF THE DAY", "SPECIAL DAY", "GK"][i], rowMargin + 2, yOffset + 3.5, {baseline: 'middle'});
+        
+        // Add entered text in the second column
+        doc.text(textLines, rowMargin + firstColumnWidth + 2, yOffset + 3.5, {baseline: 'middle'});
+        
+        yOffset += rowHeight;
+        if (i === 2 || i === 6) {
+            yOffset += 10;
+        }
+    }
+    doc.setFontSize(12); // Reset font size to 12 for the rest of the document
+
+    // Check if content exceeds page height minus bottom margin and add a new page if necessary for the green heading row
+    if (yOffset + 10 + 10 > doc.internal.pageSize.getHeight()) {
+        doc.addPage();
+        yOffset = 10;  // Top margin for new page
+    }
+
+    // Add the green heading row
+    const headingRowHeight = 10;
+    doc.setFillColor(0, 128, 0); // Green color
+    doc.rect(rowMargin, yOffset, rowWidth, headingRowHeight, 'F');
+    doc.rect(rowMargin, yOffset, rowWidth, headingRowHeight);
+    
+    const periodWidth = 30;
+    const subjectWidth = 40;
+    const topicWidth = rowWidth - periodWidth - subjectWidth;
+    
+    // Center align headings
+    const periodTextWidth = doc.getTextWidth("PERIOD");
+    const subjectTextWidth = doc.getTextWidth("SUBJECT");
+    const topicTextWidth = doc.getTextWidth("TOPIC");
+    
+    doc.setTextColor(255, 255, 255); // Set text color to white for headings
+    doc.text("PERIOD", rowMargin + (periodWidth / 2) - (periodTextWidth / 2), yOffset + 7);
+    doc.text("SUBJECT", rowMargin + periodWidth + (subjectWidth / 2) - (subjectTextWidth / 2), yOffset + 7);
+    doc.text("TOPIC", rowMargin + periodWidth + subjectWidth + (topicWidth / 2) - (topicTextWidth / 2), yOffset + 7);
+    
+    // Adding inline borders for the green heading row
+    doc.line(rowMargin + periodWidth, yOffset, rowMargin + periodWidth, yOffset + headingRowHeight);
+    doc.line(rowMargin + periodWidth + subjectWidth, yOffset, rowMargin + periodWidth + subjectWidth, yOffset + headingRowHeight);
+    
+    yOffset += headingRowHeight;
+
+    doc.setTextColor(0, 0, 0); // Set text color back to black for the rows below the green row
+
+    const divs = document.querySelectorAll('#inputFields div[contenteditable]');
+    const inputs = Array.from(divs);
+
+  for (let i = 0; i < inputs.length; i += 3) {
+    const period = inputs[i].textContent;
+    let subject = inputs[i + 1].textContent;
+    const topic = inputs[i + 2].textContent;
+
+    subject = subject.toUpperCase(); // Convert subject text to uppercase
+
+    const periodLines = doc.splitTextToSize(period, periodWidth - 4);
+    const subjectLines = doc.splitTextToSize(subject, subjectWidth - 4);
+    const topicLines = doc.splitTextToSize(topic, topicWidth - 4);
+
+    const maxLines = Math.max(periodLines.length, subjectLines.length, topicLines.length);
+    const rowHeight = 10 * maxLines;
+
+    // Check if content exceeds page height minus bottom margin and add a new page if necessary
+    if (yOffset + rowHeight + 10 > doc.internal.pageSize.getHeight()) {
+        doc.addPage();
+        yOffset = 10;  // Top margin for new page
+    }
+
+    doc.setFillColor(255, 255, 255);
+    doc.rect(rowMargin, yOffset, rowWidth, rowHeight, 'F');
+    doc.rect(rowMargin, yOffset, rowWidth, rowHeight);
+
+    // Adding inline borders
+    doc.line(rowMargin + periodWidth, yOffset, rowMargin + periodWidth, yOffset + rowHeight);
+    doc.line(rowMargin + periodWidth + subjectWidth, yOffset, rowMargin + periodWidth + subjectWidth, yOffset + rowHeight);
+
+    // Center align text in cells
+    const periodTextWidth = doc.getTextWidth(period);
+    const periodTextPosition = rowMargin + (periodWidth / 2) - (periodTextWidth / 2);
+    doc.text(periodLines, periodTextPosition, yOffset + 7); // Centered position for 'Period'
+    doc.text(subjectLines, rowMargin + periodWidth + 2, yOffset + 7);
+    doc.text(topicLines, rowMargin + periodWidth + subjectWidth + 2, yOffset + 7);
+
+    yOffset += rowHeight;
+}
+
+doc.save('LOGBOOK.pdf');
+
+}
+	</script>
+</body>
+
+</html>
