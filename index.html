@@ -1,51 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOGBOOK </title>
-    <style>
-        @font-face {
-            font-family: 'Times New Roman';
-            src: url('https://fonts.gstatic.com/s/timesnewroman/v12/XIq6YggxM2Ib1L_6tT59cnoKNFFjDA.woff2') format('woff2');
-        }
-        body {
-            font-family: 'Times New Roman', sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
-        }
-        #setup {
-            display: block;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 50%; /* Set width to 50% */
-            margin: 0 auto; /* Center the div */
-        }
-        button {
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        div[contenteditable] {
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        h4 {
-            margin: 10px 0;
-        }
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>LOGBOOK </title>
+	<style>
+		@font-face {
+			font-family: 'Times New Roman';
+			src: url('https://fonts.gstatic.com/s/timesnewroman/v12/XIq6YggxM2Ib1L_6tT59cnoKNFFjDA.woff2') format('woff2');
+		}
+
+		body {
+			font-family: 'Times New Roman', sans-serif;
+			background-color: #f4f4f4;
+			padding: 20px;
+		}
+
+		#setup {
+			display: block;
+			background-color: #fff;
+			padding: 20px;
+			border-radius: 5px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			width: 50%;
+			/* Set width to 50% */
+			margin: 0 auto;
+			/* Center the div */
+		}
+
+		button {
+			background-color: #007BFF;
+			color: #fff;
+			border: none;
+			padding: 10px 15px;
+			border-radius: 5px;
+			cursor: pointer;
+			margin-right: 10px;
+		}
+
+		button:hover {
+			background-color: #0056b3;
+		}
+
+		div[contenteditable] {
+			padding: 8px;
+			margin-bottom: 10px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			width: 100%;
+			box-sizing: border-box;
+		}
+
+		h4 {
+			margin: 10px 0;
+		}
 	</style>
 </head>
 
@@ -76,7 +85,7 @@
 
 		<div id="inputFields"></div>
 		<button onclick="addFields()">Add</button>
-		<button onclick="DOWNLOAD PDF()">DOWNLOAD PDF </button>
+		<button onclick="saveAsPDF()">DOWNLOAD PDF </button>
 		<button onclick="refreshContents()">Refresh</button>
 	</div>
 
